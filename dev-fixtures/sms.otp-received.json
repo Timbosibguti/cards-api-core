@@ -1,0 +1,9 @@
+{
+  "source": "sms_gateway",
+  "event_type": "otp_received",
+  "payload": {
+    "phone": "+79991234567",
+    "text": "Your OTP is 123456",
+    "received_at": "2026-03-06T12:00:00Z"
+  }
+}

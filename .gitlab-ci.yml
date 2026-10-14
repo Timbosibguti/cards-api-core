@@ -1,0 +1,109 @@
+stages:
+  - build
+  - deploy
+
+default:
+  image: docker:28.5.1
+  services:
+    - docker:28.5.1-dind
+
+.default_rules:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH =~ /dev.*/
+
+variables:
+    PROJECT_NAME: processorhub
+
+build:
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  stage: build
+  tags:
+    - docker
+    - asia
+  rules:
+    -  !reference [.default_rules, rules]
+  before_script:
+    - echo "Login in registry..."
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "Build image..."
+    - docker build -t "$IMAGE_TAG" --file deploy/Dockerfile .
+    - echo "list images"
+    - docker image ls
+    - echo "Pushing..."
+    - docker push $IMAGE_TAG
+
+
+install:
+  stage: deploy
+  environment:
+    name: ${CI_COMMIT_REF_SLUG}
+    # url: http://$PROJECT_NAME-$CI_COMMIT_REF_NAME.$DEPLOY_DOMAIN_NAME/
+    url: https://hub.groscloud.com/
+    on_stop: uninstall
+  rules:
+    -  !reference [.default_rules, rules]
+  variables:
+      INSTALL_DOMAIN_NAME: $DEPLOY_DOMAIN_NAME
+      INSTALL_ACTION: install
+      INSTALL_TAGS: "precheck,deploy,nginx"
+      INSTALL_SSH_KEY: $SSH_KEY
+      INSTALL_DEPLOY_HOST: $DEPLOY_TARGET_HOST
+      INSTALL_DEPLOY_PORT: $DEPLOY_TARGET_PORT
+      INSTALL_IMAGE1: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+      INSTALL_PROJECT_NAME: ${PROJECT_NAME}
+      INSTALL_COMPOSE_DIR: "deploy"
+      INSTALL_REPO_ID: $CI_PROJECT_ID
+      INSTALL_REPO_BRANCH: $CI_COMMIT_REF_NAME
+      INSTALL_COPY_FILES: ""
+      INSTALL_COPY_TEMPLATE_FILES: "deploy/docker-compose.yml;deploy/env_file"
+      ADSCARD: $ADSCARD
+      CARD_CREDS_ENCRYPTION_KEY: $CARD_CREDS_ENCRYPTION_KEY
+      ENCRYPTION_KEY: $ENCRYPTION_KEY
+      ECARDS: $ECARDS
+      FARM_DB: $FARM_DB
+      FINANCE_DB: $FINANCE_DB
+      MQTT: $MQTT
+      MULTICARDS: $MULTICARDS
+      NODE_ENV: $NODE_ENV
+      SLACK: $SLACK
+      STELLARCARDS: $STELLARCARDS
+      SYNC_DB: $SYNC_DB
+      UNLINK_DEAD_DEFAULT_DAYS: $UNLINK_DEAD_DEFAULT_DAYS
+      UNLINK_DEAD_STELLARCARDS_DAYS: $UNLINK_DEAD_STELLARCARDS_DAYS
+  trigger:
+    project: automation/ansible/docker-compose-install
+    forward:
+      pipeline_variables: false
+      yaml_variables: true
+    branch: templated
+    strategy: depend
+  needs:
+    - job: build
+      artifacts: false
+
+
+uninstall:
+  stage: deploy
+  variables:
+    INSTALL_ACTION: uninstall
+    INSTALL_DEPLOY_HOST: $DEPLOY_TARGET_HOST
+    INSTALL_SSH_KEY: $SSH_KEY
+    INSTALL_PROJECT_NAME: ${PROJECT_NAME}
+    INSTALL_COMPOSE_DIR: "deploy"
+    INSTALL_COPY_FILES: ""
+    INSTALL_COPY_TEMPLATE_FILES: "deploy/docker-compose.yml;deploy/env_file"
+    INSTALL_REPO_BRANCH: $CI_COMMIT_REF_NAME
+  trigger:
+    project: automation/ansible/docker-compose-install
+    forward:
+      pipeline_variables: false
+      yaml_variables: true
+    branch: templated
+    strategy: depend
+  when: manual
+  environment:
+    name: ${CI_COMMIT_REF_SLUG}
+    action: stop

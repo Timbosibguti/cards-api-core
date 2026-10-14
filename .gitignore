@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.env.local.test
+.env.local
+.env.prod
+*.log
+.DS_Store
+*.csv
+.vscode/settings.json
+
+# Локальные дампы транзакций / PII (используйте dev-fixtures/)
+/adscards.json
+/ecards.json
+/multicards.json
+/stellarcards.json
+/adscards/
+
+# Deploy secrets (шаблон: deploy/docker-compose.yml в CI)
+deploy/env_file
+deploy/.env

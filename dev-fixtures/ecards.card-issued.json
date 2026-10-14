@@ -1,0 +1,9 @@
+{
+  "source": "ecards",
+  "event_type": "card_issued",
+  "payload": {
+    "cardId": "dev-fixture-card-001",
+    "acc_no": "dev-acc-001",
+    "status": "active"
+  }
+}

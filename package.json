@@ -1,0 +1,50 @@
+{
+  "name": "processor-hub",
+  "version": "0.1.0",
+  "description": "Единый сервис для работы с платёжными системами и банками",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/bootstrap.ts",
+    "build": "tsc",
+    "start": "node dist/bootstrap.js",
+    "adapter": "tsx src/bin/adapter.ts",
+    "import:march-2026:bank-transactions": "tsx src/bin/importMarch2026BankTransactions.ts",
+    "report:missing-google-ads-ids:march-april-2026": "tsx src/bin/findMissingGoogleAdsTransactionsMarApr2026.ts",
+    "report:merchant-stats:since-march-2026": "tsx src/bin/buildMerchantStatsSinceMarch2026.ts",
+    "fix:march-2026:imported-transactions-google-ads": "tsx src/bin/fixMarch2026ImportedTransactionsByGoogleAdsId.ts",
+    "resolve:spend-csv": "tsx src/bin/resolveSpendCsv.ts",
+    "report:ecards:funds-card-stats": "tsx src/bin/buildEcardsFundsCardStats.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@datalust/winston-seq": "^3.0.1",
+    "@fastify/multipart": "^8.3.1",
+    "csv-parse": "^5.5.3",
+    "dotenv": "^17.3.1",
+    "fastify": "^4.28.1",
+    "pdf-parse": "^1.1.1",
+    "javascript-obfuscator": "^5.4.1",
+    "mqtt": "^5.15.0",
+    "winston": "^3.19.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/node": "^22.10.1",
+    "@types/pg": "^8.18.0",
+    "eslint": "^10.0.2",
+    "pg": "^8.19.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^2.1.0"
+  }
+}

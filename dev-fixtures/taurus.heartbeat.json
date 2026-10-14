@@ -1,0 +1,9 @@
+{
+  "source": "taurus",
+  "event_type": "taurus_heartbeat",
+  "payload": {
+    "device_id": "dev-taurus-001",
+    "timestamp": "2026-03-06T12:00:00Z",
+    "status": "online"
+  }
+}
